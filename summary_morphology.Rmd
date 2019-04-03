@@ -1,0 +1,56 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This document describes how data were retrieved to make a summary of morphometrics of captured turtles at Seal Beach Wildlife Refuge.  It requires an ODBC (open databse connectivity) interface to various databases at the Southwest Fisheries Science Center in La Jolla, CA. 
+
+Load necessary libraries and define constants. 
+```{r}
+library(RODBC)
+library(tidyverse)
+
+SWFSC <- T
+
+# change this date when not at SWFSC - find it out from the saved file.
+run.date <- Sys.Date()
+
+query.years <- c(2013, 2014)
+
+```
+
+Then query the tables for size information. If at SWFSC, connect to the databases. If not, use the downloaded data.  If data have not been downloaded and not at SWFSC, nothing works.  
+
+```{r}
+if (SWFSC){
+  Turtle <- odbcConnect(dsn = 'Turtle', uid = '', pwd = '')
+  #Turtle.tbls <- sqlTables(Turtle)
+  Turtle.SanG <- sqlQuery(Turtle,
+                         'select * from vw_San_Gabriel_Capture') %>%
+    select(Capture_Year, Capture_Month, Capture_Day, Capture_Hour, Capture_Minute,
+           Capture_Latitude, Capture_Longitude, SCL_cm, SCW_cm, Body_Depth, 
+           CCL_cm, CCW_cm, Weight_kg, Sat_Tags, Sat_Max_Tag)
+  odbcClose(Turtle)
+  
+  write.csv(Turtle.SanG,
+            file = paste0("data/Turtle_SanG", Sys.Date(), ".csv"),
+            quote = F, row.names = F)
+
+} else {
+  # if not at SWFSC, use the local files.
+  Turtle.SanG <- read.table(file = paste0("data/Turtle_SanG", run.date, ".csv"),
+                            header = T,
+                            sep = ",")
+  
+}
+
+```
+
+Once all necessary data are extracted, filter to the necessary years.
+
+```{r}
+dat.years <- filter(Turtle.SanG, Capture_Year %in% query.years)
+
+
+```
+
