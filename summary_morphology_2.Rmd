@@ -33,11 +33,10 @@ if (SWFSC){
   #Turtle.tbls <- sqlTables(Turtle)
   turtle.SanG <- sqlQuery(turtle,
                          'select * from vw_San_Gabriel_Capture') %>%
-    select(PIT_Max_Tag_RFF, PIT_Max_Tag_LFF, Flipper_Max_Tag_RFF,
-           Flipper_Max_Tag_LFF, Capture_Year, Capture_Month, Capture_Day, 
-           Capture_Latitude, Capture_Longitude, SCL_cm, SCW_cm, Body_Depth, 
-           CCL_cm, CCW_cm, Weight_kg, Sat_Tags, Sat_Max_Tag, Skin_Samples,
-           Blood_Samples, Tetracycline_ml, Turtle_ID) %>%
+    select(ID, Capture_Year, Capture_Month, Capture_Day,
+           Species_ID, Turtle_ID, SCL_cm, SCW_cm, Body_Depth,
+           CCL_cm, CCW_cm, Weight_kg, Tail_Plastron_to_Tip,
+           ) %>%
     mutate(Year_caught = Capture_Year,
            Month_caught = Capture_Month,
            Day_caught = Capture_Day)
